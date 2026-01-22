@@ -11,7 +11,7 @@ fn main() {
             println!("目录已存在: .c2rust");
         }
         Err(e) => {
-            eprintln!("创建目录失败: {}", e);
+            eprintln!("创建目录 '.c2rust' 失败: {}", e);
             process::exit(1);
         }
     }
