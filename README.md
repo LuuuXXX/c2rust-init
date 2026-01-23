@@ -1,1 +1,166 @@
 # c2rust-init
+
+c2rust-init 是一个用于初始化 c2rust 项目结构的命令行工具。它可以快速创建必要的 `.c2rust` 目录，为使用 c2rust 工具链做好准备。
+
+## 项目简介
+
+c2rust-init 提供了一个简单的命令行接口来初始化 c2rust 项目的基础目录结构。该工具确保：
+- 创建标准的 `.c2rust` 配置目录
+- 优雅地处理目录已存在的情况
+- 提供清晰的错误信息
+
+## 安装方法
+
+### 从源码构建
+
+确保您已安装 Rust 工具链（推荐使用 rustup）。
+
+```bash
+# 克隆仓库
+git clone https://github.com/LuuuXXX/c2rust-init.git
+cd c2rust-init
+
+# 构建项目
+cargo build --release
+
+# 可选：将二进制文件安装到系统路径
+cargo install --path .
+```
+
+### 系统要求
+
+- Rust 1.70.0 或更高版本
+- Cargo 包管理器
+
+## 使用方法
+
+### 基本用法
+
+初始化 `.c2rust` 目录：
+
+```bash
+c2rust-init init
+```
+
+### 命令说明
+
+#### `init` 子命令
+
+创建 `.c2rust` 目录。如果目录已存在，将显示相应提示而不会报错。
+
+```bash
+# 在当前目录创建 .c2rust 目录
+c2rust-init init
+```
+
+**输出示例：**
+
+成功创建：
+```
+已创建目录: .c2rust
+```
+
+目录已存在：
+```
+目录已存在: .c2rust
+```
+
+错误情况：
+```
+创建目录 '.c2rust' 失败: Permission denied (os error 13)
+```
+
+### 查看帮助
+
+```bash
+# 查看主帮助
+c2rust-init --help
+
+# 查看 init 命令的帮助
+c2rust-init init --help
+```
+
+## 功能说明
+
+- ✅ **命令行参数解析**：使用 clap 库实现的现代化 CLI 接口
+- ✅ **init 子命令**：初始化 `.c2rust` 目录结构
+- ✅ **优雅的错误处理**：
+  - 自动检测目录是否已存在
+  - 提供清晰的错误信息
+  - 适当的退出码（成功：0，失败：1）
+- ✅ **友好的用户体验**：中文输出信息，易于理解
+
+## 开发信息
+
+### 项目结构
+
+```
+c2rust-init/
+├── src/
+│   └── main.rs          # 主程序入口和 CLI 实现
+├── tests/
+│   ├── cli_args.rs      # CLI 参数测试
+│   └── create_c2rust_dir.rs  # 目录创建功能测试
+├── Cargo.toml           # 项目配置和依赖
+└── README.md            # 项目文档
+```
+
+### 构建项目
+
+```bash
+# 开发构建
+cargo build
+
+# 发布构建（优化）
+cargo build --release
+```
+
+### 运行测试
+
+```bash
+# 运行所有测试
+cargo test
+
+# 运行特定测试
+cargo test test_create_c2rust_dir_success
+
+# 显示测试输出
+cargo test -- --nocapture
+```
+
+### 代码检查
+
+```bash
+# 运行 clippy 进行代码检查
+cargo clippy
+
+# 格式化代码
+cargo fmt
+```
+
+### 依赖项
+
+- **运行时依赖**：
+  - `clap` (v4) - 命令行参数解析，使用 derive 特性
+
+- **开发依赖**：
+  - `tempfile` (v3) - 用于测试中创建临时目录
+
+### 贡献指南
+
+欢迎提交 Issue 和 Pull Request！
+
+在提交代码前，请确保：
+1. 所有测试通过：`cargo test`
+2. 代码格式正确：`cargo fmt`
+3. 没有 clippy 警告：`cargo clippy`
+
+## 许可证
+
+请参阅项目中的 LICENSE 文件了解详细信息。
+
+## 相关链接
+
+- [c2rust 项目](https://c2rust.com/)
+- [Rust 官方网站](https://www.rust-lang.org/)
+- [clap 文档](https://docs.rs/clap/)

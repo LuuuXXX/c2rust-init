@@ -10,6 +10,7 @@ fn test_create_c2rust_dir_success() {
 
     // Run the binary in the temp directory
     let output = Command::new(env!("CARGO_BIN_EXE_c2rust-init"))
+        .arg("init")
         .current_dir(temp_path)
         .output()
         .expect("Failed to execute binary");
@@ -45,6 +46,7 @@ fn test_create_c2rust_dir_already_exists() {
 
     // Run the binary in the temp directory
     let output = Command::new(env!("CARGO_BIN_EXE_c2rust-init"))
+        .arg("init")
         .current_dir(temp_path)
         .output()
         .expect("Failed to execute binary");
@@ -79,6 +81,7 @@ fn test_create_c2rust_dir_failure() {
 
     // Run the binary in the temp directory
     let output = Command::new(env!("CARGO_BIN_EXE_c2rust-init"))
+        .arg("init")
         .current_dir(temp_path)
         .output()
         .expect("Failed to execute binary");
