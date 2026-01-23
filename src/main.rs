@@ -39,7 +39,7 @@ fn main() {
 
     match cli.command {
         Commands::Init => {
-            if let Err(_) = init_c2rust_dir() {
+            if init_c2rust_dir().is_err() {
                 process::exit(1);
             }
         }
