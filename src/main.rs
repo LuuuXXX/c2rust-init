@@ -5,7 +5,7 @@ use std::process;
 
 #[derive(Parser)]
 #[command(name = "c2rust-init")]
-#[command(about = "Initialize c2rust project structure", long_about = None)]
+#[command(about = "初始化 c2rust 项目结构", long_about = None)]
 struct Cli {
     #[command(subcommand)]
     command: Commands,
@@ -13,7 +13,7 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// Initialize the .c2rust directory
+    /// 初始化 .c2rust 目录
     Init,
 }
 

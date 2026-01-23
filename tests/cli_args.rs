@@ -12,7 +12,7 @@ fn test_help_message() {
 
     let stdout = String::from_utf8_lossy(&output.stdout);
     assert!(
-        stdout.contains("Initialize c2rust project structure"),
+        stdout.contains("初始化 c2rust 项目结构"),
         "Help should contain program description"
     );
     assert!(
@@ -50,7 +50,7 @@ fn test_init_help() {
 
     let stdout = String::from_utf8_lossy(&output.stdout);
     assert!(
-        stdout.contains("Initialize the .c2rust directory"),
+        stdout.contains("初始化 .c2rust 目录"),
         "Init help should contain description"
     );
 }
