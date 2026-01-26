@@ -1,6 +1,5 @@
 use clap::{Parser, Subcommand};
-use std::fs;
-use std::fs::File;
+use std::fs::{self, File};
 use std::io::{ErrorKind, Write};
 use std::path::Path;
 use std::process;
