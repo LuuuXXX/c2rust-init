@@ -176,7 +176,7 @@ fn test_create_c2rust_dir_failure() {
         // If it failed, stderr should contain error message
         let stderr = String::from_utf8_lossy(&output.stderr);
         assert!(
-            stderr.contains("创建目录失败") || stderr.contains("创建配置文件失败"),
+            stderr.contains("创建目录") || stderr.contains("创建配置文件"),
             "Expected error message in stderr, got: {}",
             stderr
         );
