@@ -1,8 +1,7 @@
 use clap::{Parser, Subcommand};
 use std::fs;
 use std::fs::File;
-use std::io::ErrorKind;
-use std::io::Write;
+use std::io::{ErrorKind, Write};
 use std::path::Path;
 use std::process;
 
@@ -25,6 +24,8 @@ test = "make test"
 build = "make"
 "#;
 
+const CONFIG_PATH: &str = ".c2rust/config.toml";
+
 #[derive(Parser)]
 #[command(name = "c2rust-init")]
 #[command(about = "初始化 c2rust 项目结构", long_about = None)]
@@ -40,15 +41,15 @@ enum Commands {
 }
 
 fn create_default_config() -> Result<(), std::io::Error> {
-    let config_path = Path::new(".c2rust/config.toml");
+    let config_path = Path::new(CONFIG_PATH);
     
     if config_path.exists() {
-        println!("配置文件已存在: .c2rust/config.toml");
+        println!("配置文件已存在: {}", CONFIG_PATH);
         Ok(())
     } else {
         let mut file = File::create(config_path)?;
         file.write_all(DEFAULT_CONFIG.as_bytes())?;
-        println!("已创建配置文件: .c2rust/config.toml");
+        println!("已创建配置文件: {}", CONFIG_PATH);
         Ok(())
     }
 }
@@ -57,25 +58,23 @@ fn init_c2rust_dir() -> Result<(), std::io::Error> {
     match fs::create_dir(".c2rust") {
         Ok(_) => {
             println!("已创建目录: .c2rust");
-            if let Err(e) = create_default_config() {
-                eprintln!("创建配置文件失败: {}", e);
-                return Err(e);
-            }
-            Ok(())
         }
         Err(e) if e.kind() == ErrorKind::AlreadyExists => {
             println!("目录已存在: .c2rust");
-            if let Err(e) = create_default_config() {
-                eprintln!("创建配置文件失败: {}", e);
-                return Err(e);
-            }
-            Ok(())
         }
         Err(e) => {
             eprintln!("创建目录 '.c2rust' 失败: {}", e);
-            Err(e)
+            return Err(e);
         }
     }
+    
+    // Create config file after directory is ready
+    if let Err(e) = create_default_config() {
+        eprintln!("创建配置文件失败: {}", e);
+        return Err(e);
+    }
+    
+    Ok(())
 }
 
 fn main() {
