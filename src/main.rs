@@ -15,11 +15,11 @@ model_name = "gpt-4"
 
 [feature.default]
 # 路径相对于项目根目录(包含 .c2rust 的目录)
-"clean.dir" = "build"
+clean.dir = "build"
 clean = "make clean"
-"test.dir" = "build"
+test.dir = "build"
 test = "make test"
-"build.dir" = "build"
+build.dir = "build"
 build = "make"
 "#;
 
