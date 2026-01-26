@@ -16,11 +16,11 @@ model_name = "gpt-4"
 [feature.default]
 # 路径相对于项目根目录(包含 .c2rust 的目录)
 clean.dir = "build"
-clean = "make clean"
+clean.cmd = "make clean"
 test.dir = "build"
-test = "make test"
+test.cmd = "make test"
 build.dir = "build"
-build = "make"
+build.cmd = "make"
 "#;
 
 const CONFIG_PATH: &str = ".c2rust/config.toml";
