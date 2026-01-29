@@ -45,6 +45,10 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
         }
         Err(e) => {
             eprintln!("初始化 Git 仓库失败: {}", e);
+            // Clean up the directory if git init fails
+            if let Err(cleanup_err) = fs::remove_dir_all(&c2rust_dir) {
+                eprintln!("清理目录失败: {}", cleanup_err);
+            }
             return Err(e.into());
         }
     }
