@@ -31,6 +31,10 @@ cargo install --path .
 
 - 支持 Rust 2024 edition 的 Rust 工具链（Rust 1.85 或更高版本）
 - Cargo 包管理器
+- **构建依赖**：本项目使用 `git2` crate，需要系统安装以下开发包：
+  - **Linux**: `libssl-dev`, `pkg-config`, `cmake` (Debian/Ubuntu: `apt-get install libssl-dev pkg-config cmake`)
+  - **macOS**: 通常已预装，或通过 Homebrew: `brew install openssl pkg-config`
+  - **Windows**: 需要安装 [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/) 或使用 vcpkg
 
 ## 使用方法
 
@@ -46,7 +50,7 @@ c2rust-init init
 
 #### `init` 子命令
 
-创建 `.c2rust` 目录。如果目录已存在，将显示相应提示而不会报错。
+创建 `.c2rust` 目录并初始化 Git 仓库。如果目录已存在，将报错退出。
 
 ```bash
 # 在当前目录创建 .c2rust 目录
@@ -55,17 +59,40 @@ c2rust-init init
 
 **输出示例：**
 
-成功创建：
+成功创建（Unix/Linux/macOS）：
 ```
 已创建目录: .c2rust
+已在 .c2rust 目录初始化 Git 仓库
+c2rust 项目已初始化，项目根目录为：/path/to/current/directory
+若要在当前 shell 会话中使用该环境变量，请运行：
+    export C2RUST_PROJECT_ROOT='/path/to/current/directory'
 ```
 
-目录已存在：
+成功创建（Windows）：
 ```
-目录已存在: .c2rust
+已创建目录: .c2rust
+已在 .c2rust 目录初始化 Git 仓库
+c2rust 项目已初始化，项目根目录为：C:\path\to\current\directory
+若要在当前 shell 会话中使用该环境变量，请根据所用 shell 运行：
+  在 cmd.exe 中：
+    set "C2RUST_PROJECT_ROOT=C:\path\to\current\directory"
+  在 PowerShell 中：
+    $env:C2RUST_PROJECT_ROOT = 'C:\path\to\current\directory'
 ```
 
-错误情况：
+**注意**：`c2rust-init` 进程无法直接为您的 shell 设置环境变量。您需要按照上述提示手动在当前 shell 中导出 `C2RUST_PROJECT_ROOT` 环境变量，或将其添加到 shell 配置文件（Unix/Linux/macOS: `~/.bashrc` 或 `~/.zshrc`；Windows: 系统环境变量设置）以便永久使用。
+
+目录已存在（错误）：
+```
+错误: 目录 '.c2rust' 已存在
+```
+
+路径已存在但不是目录（错误）：
+```
+错误: 路径 '.c2rust' 已存在且不是目录
+```
+
+其他错误情况：
 ```
 创建目录 '.c2rust' 失败: Permission denied (os error 13)
 ```
