@@ -20,7 +20,10 @@ enum Commands {
 
 fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
     // Get the current directory as absolute path
-    let current_dir = env::current_dir()?;
+    let current_dir = env::current_dir().map_err(|e| {
+        eprintln!("错误: 无法获取当前目录: {}", e);
+        e
+    })?;
     let c2rust_dir = current_dir.join(".c2rust");
 
     // Create .c2rust directory
@@ -29,8 +32,22 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
             println!("已创建目录: .c2rust");
         }
         Err(e) if e.kind() == ErrorKind::AlreadyExists => {
-            eprintln!("错误: 目录 '.c2rust' 已存在");
-            return Err("目录已存在".into());
+            // `.c2rust` already exists; check whether it's actually a directory
+            match fs::metadata(&c2rust_dir) {
+                Ok(metadata) => {
+                    if metadata.is_dir() {
+                        eprintln!("错误: 目录 '.c2rust' 已存在");
+                        return Err("目录已存在".into());
+                    } else {
+                        eprintln!("错误: 路径 '.c2rust' 已存在且不是目录");
+                        return Err("路径已存在且不是目录".into());
+                    }
+                }
+                Err(meta_err) => {
+                    eprintln!("错误: 无法获取 '.c2rust' 的元数据: {}", meta_err);
+                    return Err(meta_err.into());
+                }
+            }
         }
         Err(e) => {
             eprintln!("创建目录 '.c2rust' 失败: {}", e);
@@ -57,7 +74,10 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
     // Set C2RUST_PROJECT_ROOT environment variable
     let project_root = current_dir
         .to_str()
-        .ok_or("当前路径包含无效的 UTF-8 字符")?
+        .ok_or_else(|| {
+            eprintln!("错误: 当前路径包含无效的 UTF-8 字符");
+            "当前路径包含无效的 UTF-8 字符"
+        })?
         .to_string();
     // SAFETY: This is safe because we're in a single-threaded context (main function,
     // before any threads are spawned), and the environment variable is being set

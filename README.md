@@ -31,6 +31,10 @@ cargo install --path .
 
 - 支持 Rust 2024 edition 的 Rust 工具链（Rust 1.85 或更高版本）
 - Cargo 包管理器
+- **构建依赖**：本项目使用 `git2` crate，需要系统安装以下开发包：
+  - **Linux**: `libssl-dev`, `pkg-config`, `cmake` (Debian/Ubuntu: `apt-get install libssl-dev pkg-config cmake`)
+  - **macOS**: 通常已预装，或通过 Homebrew: `brew install openssl pkg-config`
+  - **Windows**: 需要安装 [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/) 或使用 vcpkg
 
 ## 使用方法
 
