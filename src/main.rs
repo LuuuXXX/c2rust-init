@@ -45,16 +45,23 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
         }
         Err(e) => {
             eprintln!("初始化 Git 仓库失败: {}", e);
-            // Clean up the directory if git init fails
+            // Clean up the directory if git init fails to avoid partial state
             if let Err(cleanup_err) = fs::remove_dir_all(&c2rust_dir) {
-                eprintln!("清理目录失败: {}", cleanup_err);
+                eprintln!("警告: 清理目录失败: {}", cleanup_err);
+                eprintln!("请手动删除目录: {}", c2rust_dir.display());
             }
             return Err(e.into());
         }
     }
 
     // Set C2RUST_PROJECT_ROOT environment variable
-    let project_root = current_dir.to_string_lossy().to_string();
+    let project_root = current_dir
+        .to_str()
+        .ok_or("当前路径包含无效的 UTF-8 字符")?
+        .to_string();
+    // SAFETY: This is safe because we're in a single-threaded context (main function,
+    // before any threads are spawned), and the environment variable is being set
+    // with valid UTF-8 strings that we control.
     unsafe {
         env::set_var("C2RUST_PROJECT_ROOT", &project_root);
     }
