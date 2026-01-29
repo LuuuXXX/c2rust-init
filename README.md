@@ -61,9 +61,9 @@ c2rust-init init
 
 成功创建：
 ```
-已设置环境变量 C2RUST_PROJECT_ROOT=/path/to/current/directory
 已创建目录: .c2rust
 已在 .c2rust 目录初始化 Git 仓库
+已设置环境变量 C2RUST_PROJECT_ROOT=/path/to/current/directory
 ```
 
 目录已存在（错误）：

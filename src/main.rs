@@ -34,10 +34,6 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
     unsafe {
         env::set_var("C2RUST_PROJECT_ROOT", current_dir.as_os_str());
     }
-    println!(
-        "已设置环境变量 C2RUST_PROJECT_ROOT={}",
-        current_dir.display()
-    );
 
     // Create .c2rust directory
     match fs::create_dir(&c2rust_dir) {
@@ -50,10 +46,16 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
                 Ok(metadata) => {
                     if metadata.is_dir() {
                         eprintln!("错误: 目录 '.c2rust' 已存在");
-                        return Err("目录已存在".into());
+                        return Err(
+                            std::io::Error::new(ErrorKind::AlreadyExists, "目录已存在").into()
+                        );
                     } else {
                         eprintln!("错误: 路径 '.c2rust' 已存在且不是目录");
-                        return Err("路径已存在且不是目录".into());
+                        return Err(std::io::Error::new(
+                            ErrorKind::AlreadyExists,
+                            "路径已存在且不是目录",
+                        )
+                        .into());
                     }
                 }
                 Err(meta_err) => {
@@ -83,6 +85,12 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
             return Err(e.into());
         }
     }
+
+    // Print success message for environment variable setting after all operations succeed
+    println!(
+        "已设置环境变量 C2RUST_PROJECT_ROOT={}",
+        current_dir.display()
+    );
 
     Ok(())
 }
