@@ -33,10 +33,15 @@ fn test_create_c2rust_dir_success() {
         stdout
     );
 
-    // Check that environment variable was set
+    // Check that environment variable instructions were provided
     assert!(
-        stdout.contains("已设置环境变量 C2RUST_PROJECT_ROOT="),
-        "Expected environment variable message in stdout, got: {}",
+        stdout.contains("若要在当前 shell 会话中使用该环境变量，请运行："),
+        "Expected environment variable instructions in stdout, got: {}",
+        stdout
+    );
+    assert!(
+        stdout.contains("export C2RUST_PROJECT_ROOT="),
+        "Expected export command in stdout, got: {}",
         stdout
     );
 

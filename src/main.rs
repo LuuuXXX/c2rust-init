@@ -26,11 +26,11 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
     })?;
     let c2rust_dir = current_dir.join(".c2rust");
 
-    // Set C2RUST_PROJECT_ROOT environment variable early, before any external library calls
-    // SAFETY: This is safe because we're at the very beginning of the program execution,
-    // in the main thread, before calling any external libraries (like git2) that might
-    // spawn threads. No other threads exist at this point that could concurrently access
-    // environment variables.
+    // Set C2RUST_PROJECT_ROOT environment variable before using git2, so that the
+    // repository initialization in `.c2rust` sees the correct project root.
+    // SAFETY: This is safe because although Cli::parse() has run, clap does not spawn
+    // threads, and we are still in the main thread before calling git2 which might spawn
+    // threads internally. No concurrent access to environment variables occurs.
     unsafe {
         env::set_var("C2RUST_PROJECT_ROOT", current_dir.as_os_str());
     }
@@ -38,7 +38,8 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
     // Create .c2rust directory
     match fs::create_dir(&c2rust_dir) {
         Ok(_) => {
-            println!("已创建目录: .c2rust");
+            // Success message deferred until after git init to avoid misleading output
+            // if git init fails and the directory is cleaned up
         }
         Err(e) if e.kind() == ErrorKind::AlreadyExists => {
             // `.c2rust` already exists; check whether it's actually a directory
@@ -73,6 +74,8 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
     // Initialize git repository in .c2rust directory
     match git2::Repository::init(&c2rust_dir) {
         Ok(_) => {
+            // Success - print messages now that all operations succeeded
+            println!("已创建目录: .c2rust");
             println!("已在 .c2rust 目录初始化 Git 仓库");
         }
         Err(e) => {
@@ -86,11 +89,13 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
-    // Print success message for environment variable setting after all operations succeed
+    // Print instructions for setting environment variable in shell after all operations succeed
     println!(
-        "已设置环境变量 C2RUST_PROJECT_ROOT={}",
+        "c2rust 项目已初始化，项目根目录为：{}",
         current_dir.display()
     );
+    println!("若要在当前 shell 会话中使用该环境变量，请运行：");
+    println!("    export C2RUST_PROJECT_ROOT='{}'", current_dir.display());
 
     Ok(())
 }
