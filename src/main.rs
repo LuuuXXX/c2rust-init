@@ -43,7 +43,10 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
     let c2rust_dir = current_dir.join(".c2rust");
 
     // Set C2RUST_PROJECT_ROOT before git2 initialization
-    // SAFETY: Safe because we're in main thread before git2, and clap doesn't spawn threads
+    // SAFETY: We are still executing on the main thread before any call into git2 (which may
+    // spawn threads internally), and clap's argument parsing does not spawn threads.
+    // Therefore, no concurrent access to process environment variables can occur here,
+    // making this unsafe call to `env::set_var` sound.
     unsafe {
         env::set_var("C2RUST_PROJECT_ROOT", current_dir.as_os_str());
     }
@@ -108,6 +111,7 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
         current_dir.display()
     );
 
+    // Use explicit UTF-8 conversion to avoid lossy conversion with display()
     match current_dir.to_str() {
         Some(dir_str) => print_env_var_instructions(dir_str),
         None => {
