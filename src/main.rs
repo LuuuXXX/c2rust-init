@@ -22,7 +22,7 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
     // Get the current directory as absolute path
     let current_dir = env::current_dir()?;
     let c2rust_dir = current_dir.join(".c2rust");
-    
+
     // Create .c2rust directory
     match fs::create_dir(&c2rust_dir) {
         Ok(_) => {
@@ -37,7 +37,7 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
             return Err(e.into());
         }
     }
-    
+
     // Initialize git repository in .c2rust directory
     match git2::Repository::init(&c2rust_dir) {
         Ok(_) => {
@@ -48,14 +48,14 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
             return Err(e.into());
         }
     }
-    
+
     // Set C2RUST_PROJECT_ROOT environment variable
     let project_root = current_dir.to_string_lossy().to_string();
     unsafe {
         env::set_var("C2RUST_PROJECT_ROOT", &project_root);
     }
     println!("已设置环境变量 C2RUST_PROJECT_ROOT={}", project_root);
-    
+
     Ok(())
 }
 

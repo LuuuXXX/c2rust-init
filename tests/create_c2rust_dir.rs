@@ -25,14 +25,14 @@ fn test_create_c2rust_dir_success() {
         "Expected success message in stdout, got: {}",
         stdout
     );
-    
+
     // Check that git repository was initialized
     assert!(
         stdout.contains("已在 .c2rust 目录初始化 Git 仓库"),
         "Expected git init message in stdout, got: {}",
         stdout
     );
-    
+
     // Check that environment variable was set
     assert!(
         stdout.contains("已设置环境变量 C2RUST_PROJECT_ROOT="),
@@ -46,7 +46,7 @@ fn test_create_c2rust_dir_success() {
         c2rust_path.exists() && c2rust_path.is_dir(),
         "Directory .c2rust should exist"
     );
-    
+
     // Verify git repository was initialized
     let git_path = c2rust_path.join(".git");
     assert!(
@@ -73,7 +73,10 @@ fn test_create_c2rust_dir_already_exists() {
         .expect("Failed to execute binary");
 
     // Check that the command FAILED (directory already exists is an error)
-    assert!(!output.status.success(), "Command should fail when directory exists");
+    assert!(
+        !output.status.success(),
+        "Command should fail when directory exists"
+    );
 
     // Check stderr contains error message
     let stderr = String::from_utf8_lossy(&output.stderr);
@@ -113,7 +116,7 @@ fn test_create_c2rust_dir_failure() {
     // In all cases, the command should fail
 
     assert!(!output.status.success(), "Command should fail");
-    
+
     // stderr should contain error message
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(
