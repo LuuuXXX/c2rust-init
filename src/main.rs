@@ -26,6 +26,19 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
     })?;
     let c2rust_dir = current_dir.join(".c2rust");
 
+    // Set C2RUST_PROJECT_ROOT environment variable early, before any external library calls
+    // SAFETY: This is safe because we're at the very beginning of the program execution,
+    // in the main thread, before calling any external libraries (like git2) that might
+    // spawn threads. No other threads exist at this point that could concurrently access
+    // environment variables.
+    unsafe {
+        env::set_var("C2RUST_PROJECT_ROOT", current_dir.as_os_str());
+    }
+    println!(
+        "已设置环境变量 C2RUST_PROJECT_ROOT={}",
+        current_dir.display()
+    );
+
     // Create .c2rust directory
     match fs::create_dir(&c2rust_dir) {
         Ok(_) => {
@@ -70,22 +83,6 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
             return Err(e.into());
         }
     }
-
-    // Set C2RUST_PROJECT_ROOT environment variable
-    let project_root = current_dir
-        .to_str()
-        .ok_or_else(|| {
-            eprintln!("错误: 当前路径包含无效的 UTF-8 字符");
-            "当前路径包含无效的 UTF-8 字符"
-        })?
-        .to_string();
-    // SAFETY: This is safe because we're in a single-threaded context (main function,
-    // before any threads are spawned), and the environment variable is being set
-    // with valid UTF-8 strings that we control.
-    unsafe {
-        env::set_var("C2RUST_PROJECT_ROOT", &project_root);
-    }
-    println!("已设置环境变量 C2RUST_PROJECT_ROOT={}", project_root);
 
     Ok(())
 }

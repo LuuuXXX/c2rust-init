@@ -50,7 +50,7 @@ c2rust-init init
 
 #### `init` 子命令
 
-创建 `.c2rust` 目录。如果目录已存在，将显示相应提示而不会报错。
+创建 `.c2rust` 目录并初始化 Git 仓库。如果目录已存在，将报错退出。
 
 ```bash
 # 在当前目录创建 .c2rust 目录
@@ -61,15 +61,22 @@ c2rust-init init
 
 成功创建：
 ```
+已设置环境变量 C2RUST_PROJECT_ROOT=/path/to/current/directory
 已创建目录: .c2rust
+已在 .c2rust 目录初始化 Git 仓库
 ```
 
-目录已存在：
+目录已存在（错误）：
 ```
-目录已存在: .c2rust
+错误: 目录 '.c2rust' 已存在
 ```
 
-错误情况：
+路径已存在但不是目录（错误）：
+```
+错误: 路径 '.c2rust' 已存在且不是目录
+```
+
+其他错误情况：
 ```
 创建目录 '.c2rust' 失败: Permission denied (os error 13)
 ```
