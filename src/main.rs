@@ -43,7 +43,7 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
     let c2rust_dir = current_dir.join(".c2rust");
 
     // Set C2RUST_PROJECT_ROOT before git2 initialization
-    // SAFETY: Safe in single-threaded context before git2 spawns internal threads
+    // SAFETY: Safe because we're in main thread before git2, and clap doesn't spawn threads
     unsafe {
         env::set_var("C2RUST_PROJECT_ROOT", current_dir.as_os_str());
     }
