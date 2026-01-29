@@ -6,6 +6,7 @@ rust-version = "1.85"
 
 [dependencies]
 clap = { version = "4", features = ["derive"] }
+git2 = "0.19"
 
 [dev-dependencies]
 tempfile = "3"

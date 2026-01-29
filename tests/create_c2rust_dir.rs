@@ -25,12 +25,33 @@ fn test_create_c2rust_dir_success() {
         "Expected success message in stdout, got: {}",
         stdout
     );
+    
+    // Check that git repository was initialized
+    assert!(
+        stdout.contains("已在 .c2rust 目录初始化 Git 仓库"),
+        "Expected git init message in stdout, got: {}",
+        stdout
+    );
+    
+    // Check that environment variable was set
+    assert!(
+        stdout.contains("已设置环境变量 C2RUST_PROJECT_ROOT="),
+        "Expected environment variable message in stdout, got: {}",
+        stdout
+    );
 
     // Verify the directory was created
     let c2rust_path = temp_path.join(".c2rust");
     assert!(
         c2rust_path.exists() && c2rust_path.is_dir(),
         "Directory .c2rust should exist"
+    );
+    
+    // Verify git repository was initialized
+    let git_path = c2rust_path.join(".git");
+    assert!(
+        git_path.exists() && git_path.is_dir(),
+        "Git repository should be initialized in .c2rust"
     );
 }
 
@@ -51,15 +72,15 @@ fn test_create_c2rust_dir_already_exists() {
         .output()
         .expect("Failed to execute binary");
 
-    // Check that the command succeeded (directory already exists is not an error)
-    assert!(output.status.success(), "Command should succeed");
+    // Check that the command FAILED (directory already exists is an error)
+    assert!(!output.status.success(), "Command should fail when directory exists");
 
-    // Check stdout contains already exists message
-    let stdout = String::from_utf8_lossy(&output.stdout);
+    // Check stderr contains error message
+    let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(
-        stdout.contains("目录已存在: .c2rust"),
-        "Expected 'already exists' message in stdout, got: {}",
-        stdout
+        stderr.contains("错误: 目录 '.c2rust' 已存在"),
+        "Expected 'already exists' error message in stderr, got: {}",
+        stderr
     );
 
     // Verify the directory still exists
@@ -87,27 +108,19 @@ fn test_create_c2rust_dir_failure() {
         .expect("Failed to execute binary");
 
     // The behavior may vary by platform:
-    // - Some platforms may fail with an error (exit code != 0)
-    // - Some platforms may treat it as AlreadyExists
-    // We need to handle both cases as acceptable
+    // - Some platforms may fail with AlreadyExists error
+    // - Some platforms may fail with a different error (NotADirectory, etc)
+    // In all cases, the command should fail
 
-    if !output.status.success() {
-        // If it failed, stderr should contain error message
-        let stderr = String::from_utf8_lossy(&output.stderr);
-        assert!(
-            stderr.contains("创建目录"),
-            "Expected error message in stderr, got: {}",
-            stderr
-        );
-    } else {
-        // If it succeeded (treated as already exists), stdout should indicate that
-        let stdout = String::from_utf8_lossy(&output.stdout);
-        assert!(
-            stdout.contains("目录已存在: .c2rust"),
-            "Expected 'already exists' message in stdout when treated as success, got: {}",
-            stdout
-        );
-    }
+    assert!(!output.status.success(), "Command should fail");
+    
+    // stderr should contain error message
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("错误") || stderr.contains("失败"),
+        "Expected error message in stderr, got: {}",
+        stderr
+    );
 
     // The file should still exist (not replaced)
     assert!(c2rust_path.exists(), "Path .c2rust should still exist");
