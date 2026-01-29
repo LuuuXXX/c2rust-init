@@ -59,7 +59,7 @@ c2rust-init init
 
 **输出示例：**
 
-成功创建：
+成功创建（Unix/Linux/macOS）：
 ```
 已创建目录: .c2rust
 已在 .c2rust 目录初始化 Git 仓库
@@ -68,7 +68,19 @@ c2rust 项目已初始化，项目根目录为：/path/to/current/directory
     export C2RUST_PROJECT_ROOT='/path/to/current/directory'
 ```
 
-**注意**：`c2rust-init` 进程无法直接为您的 shell 设置环境变量。您需要按照上述提示手动在当前 shell 中导出 `C2RUST_PROJECT_ROOT` 环境变量，或将其添加到 shell 配置文件（如 `~/.bashrc` 或 `~/.zshrc`）以便永久使用。
+成功创建（Windows）：
+```
+已创建目录: .c2rust
+已在 .c2rust 目录初始化 Git 仓库
+c2rust 项目已初始化，项目根目录为：C:\path\to\current\directory
+若要在当前 shell 会话中使用该环境变量，请根据所用 shell 运行：
+  在 cmd.exe 中：
+    set C2RUST_PROJECT_ROOT=C:\path\to\current\directory
+  在 PowerShell 中：
+    $env:C2RUST_PROJECT_ROOT = "C:\path\to\current\directory"
+```
+
+**注意**：`c2rust-init` 进程无法直接为您的 shell 设置环境变量。您需要按照上述提示手动在当前 shell 中导出 `C2RUST_PROJECT_ROOT` 环境变量，或将其添加到 shell 配置文件（Unix/Linux/macOS: `~/.bashrc` 或 `~/.zshrc`；Windows: 系统环境变量设置）以便永久使用。
 
 目录已存在（错误）：
 ```

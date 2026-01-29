@@ -94,8 +94,20 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
         "c2rust 项目已初始化，项目根目录为：{}",
         current_dir.display()
     );
-    println!("若要在当前 shell 会话中使用该环境变量，请运行：");
-    println!("    export C2RUST_PROJECT_ROOT='{}'", current_dir.display());
+
+    if cfg!(windows) {
+        println!("若要在当前 shell 会话中使用该环境变量，请根据所用 shell 运行：");
+        println!("  在 cmd.exe 中：");
+        println!("    set C2RUST_PROJECT_ROOT={}", current_dir.display());
+        println!("  在 PowerShell 中：");
+        println!(
+            "    $env:C2RUST_PROJECT_ROOT = \"{}\"",
+            current_dir.display()
+        );
+    } else {
+        println!("若要在当前 shell 会话中使用该环境变量，请运行：");
+        println!("    export C2RUST_PROJECT_ROOT='{}'", current_dir.display());
+    }
 
     Ok(())
 }

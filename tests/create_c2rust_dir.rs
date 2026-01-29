@@ -35,13 +35,18 @@ fn test_create_c2rust_dir_success() {
 
     // Check that environment variable instructions were provided
     assert!(
-        stdout.contains("若要在当前 shell 会话中使用该环境变量，请运行："),
+        stdout.contains("若要在当前 shell 会话中使用该环境变量"),
         "Expected environment variable instructions in stdout, got: {}",
         stdout
     );
+
+    // Accept platform-appropriate commands for setting C2RUST_PROJECT_ROOT
+    let has_unix_export = stdout.contains("export C2RUST_PROJECT_ROOT=");
+    let has_windows_cmd = stdout.contains("set C2RUST_PROJECT_ROOT=");
+    let has_powershell = stdout.contains("$env:C2RUST_PROJECT_ROOT");
     assert!(
-        stdout.contains("export C2RUST_PROJECT_ROOT="),
-        "Expected export command in stdout, got: {}",
+        has_unix_export || has_windows_cmd || has_powershell,
+        "Expected environment variable setup command for C2RUST_PROJECT_ROOT in stdout, got: {}",
         stdout
     );
 
