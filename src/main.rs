@@ -95,23 +95,30 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
         current_dir.display()
     );
 
-    let dir_str = current_dir.display().to_string();
-
-    if cfg!(windows) {
-        println!("若要在当前 shell 会话中使用该环境变量，请根据所用 shell 运行：");
-        println!("  在 cmd.exe 中：");
-        // Use set "VAR=value" form which is safer for paths with special characters
-        println!("    set \"C2RUST_PROJECT_ROOT={}\"", dir_str);
-        println!("  在 PowerShell 中：");
-        // Use single quotes in PowerShell which are safer for literal strings
-        // Double single quotes to escape them
-        let ps_escaped = dir_str.replace("'", "''");
-        println!("    $env:C2RUST_PROJECT_ROOT = '{}'", ps_escaped);
-    } else {
-        println!("若要在当前 shell 会话中使用该环境变量，请运行：");
-        // Escape single quotes in POSIX shells by replacing ' with '\''
-        let posix_escaped = dir_str.replace("'", "'\\''");
-        println!("    export C2RUST_PROJECT_ROOT='{}'", posix_escaped);
+    // Use explicit UTF-8 conversion to avoid lossy conversion with display()
+    match current_dir.to_str() {
+        Some(dir_str) => {
+            if cfg!(windows) {
+                println!("若要在当前 shell 会话中使用该环境变量，请根据所用 shell 运行：");
+                println!("  在 cmd.exe 中：");
+                // Use set "VAR=value" form which is safer for paths with special characters
+                println!("    set \"C2RUST_PROJECT_ROOT={}\"", dir_str);
+                println!("  在 PowerShell 中：");
+                // Use single quotes in PowerShell which are safer for literal strings
+                // Double single quotes to escape them
+                let ps_escaped = dir_str.replace("'", "''");
+                println!("    $env:C2RUST_PROJECT_ROOT = '{}'", ps_escaped);
+            } else {
+                println!("若要在当前 shell 会话中使用该环境变量，请运行：");
+                // Escape single quotes in POSIX shells by replacing ' with '\''
+                let posix_escaped = dir_str.replace("'", "'\\''");
+                println!("    export C2RUST_PROJECT_ROOT='{}'", posix_escaped);
+            }
+        }
+        None => {
+            println!("注意: 当前路径包含非 UTF-8 字符，无法生成 shell 命令。");
+            println!("环境变量 C2RUST_PROJECT_ROOT 已在当前进程中设置，但您需要手动配置 shell。");
+        }
     }
 
     Ok(())
