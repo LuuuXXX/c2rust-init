@@ -91,25 +91,31 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
     match git2::Repository::init(&c2rust_dir) {
         Ok(repo) => {
             // 配置仓库级别的 user.name 和 user.email（非 --global）
+            let mut git_config_success = true;
             match repo.config() {
                 Ok(mut config) => {
                     // 设置默认的 user.name 和 user.email
                     if let Err(e) = config.set_str("user.name", "c2rust-auto") {
                         eprintln!("警告: 无法设置 git user.name: {}", e);
+                        git_config_success = false;
                     }
                     if let Err(e) = config.set_str("user.email", "c2rust-auto@localhost") {
                         eprintln!("警告: 无法设置 git user.email: {}", e);
+                        git_config_success = false;
                     }
                 }
                 Err(e) => {
                     eprintln!("警告: 无法获取 git 配置: {}", e);
+                    git_config_success = false;
                 }
             }
             
             // Success - print messages now that all operations succeeded
             println!("已创建目录: .c2rust");
             println!("已在 .c2rust 目录初始化 Git 仓库");
-            println!("已配置默认的 git user.name 和 user.email");
+            if git_config_success {
+                println!("已配置默认的 git user.name 和 user.email");
+            }
         }
         Err(e) => {
             eprintln!("初始化 Git 仓库失败: {}", e);
