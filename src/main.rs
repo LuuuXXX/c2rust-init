@@ -109,7 +109,7 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
                     git_config_success = false;
                 }
             }
-            
+
             // Success - print messages now that all operations succeeded
             println!("已创建目录: .c2rust");
             println!("已在 .c2rust 目录初始化 Git 仓库");

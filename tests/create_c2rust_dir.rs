@@ -165,10 +165,10 @@ fn test_git_config_is_set() {
     let c2rust_path = temp_path.join(".c2rust");
     let repo = git2::Repository::open(&c2rust_path).expect("Failed to open git repository");
     let config = repo.config().expect("Failed to get git config");
-    
+
     let user_name = config.get_string("user.name").expect("user.name should be set");
     let user_email = config.get_string("user.email").expect("user.email should be set");
-    
+
     assert_eq!(user_name, "c2rust-auto");
     assert_eq!(user_email, "c2rust-auto@localhost");
 
