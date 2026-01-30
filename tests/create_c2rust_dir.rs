@@ -33,6 +33,13 @@ fn test_create_c2rust_dir_success() {
         stdout
     );
 
+    // Check that git config was set
+    assert!(
+        stdout.contains("已配置默认的 git user.name 和 user.email"),
+        "Expected git config message in stdout, got: {}",
+        stdout
+    );
+
     // Check that environment variable instructions were provided
     assert!(
         stdout.contains("若要在当前 shell 会话中使用该环境变量"),
@@ -137,4 +144,39 @@ fn test_create_c2rust_dir_failure() {
 
     // The file should still exist (not replaced)
     assert!(c2rust_path.exists(), "Path .c2rust should still exist");
+}
+
+/// Test that git config (user.name and user.email) is set in the repository
+#[test]
+fn test_git_config_is_set() {
+    let temp_dir = TempDir::new().unwrap();
+    let temp_path = temp_dir.path();
+
+    // Run the binary in the temp directory
+    let output = Command::new(env!("CARGO_BIN_EXE_c2rust-init"))
+        .arg("init")
+        .current_dir(temp_path)
+        .output()
+        .expect("Failed to execute binary");
+
+    assert!(output.status.success(), "Command should succeed");
+
+    // Verify git config was set
+    let c2rust_path = temp_path.join(".c2rust");
+    let repo = git2::Repository::open(&c2rust_path).expect("Failed to open git repository");
+    let config = repo.config().expect("Failed to get git config");
+    
+    let user_name = config.get_string("user.name").expect("user.name should be set");
+    let user_email = config.get_string("user.email").expect("user.email should be set");
+    
+    assert_eq!(user_name, "c2rust-auto");
+    assert_eq!(user_email, "c2rust-auto@localhost");
+
+    // Check stdout contains the git config success message
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(
+        stdout.contains("已配置默认的 git user.name 和 user.email"),
+        "Expected git config success message in stdout, got: {}",
+        stdout
+    );
 }
