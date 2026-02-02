@@ -18,22 +18,6 @@ enum Commands {
     Init,
 }
 
-/// Print shell-specific instructions for setting the C2RUST_PROJECT_ROOT environment variable
-fn print_env_var_instructions(dir_str: &str) {
-    if cfg!(windows) {
-        println!("若要在当前 shell 会话中使用该环境变量，请根据所用 shell 运行：");
-        println!("  在 cmd.exe 中：");
-        println!("    set \"C2RUST_PROJECT_ROOT={}\"", dir_str);
-        println!("  在 PowerShell 中：");
-        let ps_escaped = dir_str.replace("'", "''");
-        println!("    $env:C2RUST_PROJECT_ROOT = '{}'", ps_escaped);
-    } else {
-        println!("若要在当前 shell 会话中使用该环境变量，请运行：");
-        let posix_escaped = dir_str.replace("'", "'\\''");
-        println!("    export C2RUST_PROJECT_ROOT='{}'", posix_escaped);
-    }
-}
-
 fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
     // Get the current directory as absolute path
     let current_dir = env::current_dir().map_err(|e| {
@@ -41,15 +25,6 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
         e
     })?;
     let c2rust_dir = current_dir.join(".c2rust");
-
-    // Set C2RUST_PROJECT_ROOT before git2 initialization
-    // SAFETY: We are still executing on the main thread before any call into git2 (which may
-    // spawn threads internally), and clap's argument parsing does not spawn threads.
-    // Therefore, no concurrent access to process environment variables can occur here,
-    // making this unsafe call to `env::set_var` sound.
-    unsafe {
-        env::set_var("C2RUST_PROJECT_ROOT", current_dir.as_os_str());
-    }
 
     // Create .c2rust directory
     match fs::create_dir(&c2rust_dir) {
@@ -128,20 +103,11 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
-    // Print instructions for setting environment variable in shell after all operations succeed
+    // Print success message after all operations succeed
     println!(
         "c2rust 项目已初始化，项目根目录为：{}",
         current_dir.display()
     );
-
-    // Use explicit UTF-8 conversion to avoid lossy conversion with display()
-    match current_dir.to_str() {
-        Some(dir_str) => print_env_var_instructions(dir_str),
-        None => {
-            println!("注意: 当前路径包含非 UTF-8 字符，无法生成 shell 命令。");
-            println!("环境变量 C2RUST_PROJECT_ROOT 已在当前进程中设置，但您需要手动配置 shell。");
-        }
-    }
 
     Ok(())
 }
