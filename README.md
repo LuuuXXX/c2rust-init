@@ -182,9 +182,75 @@ cargo fmt
 2. 代码格式正确：`cargo fmt`
 3. 没有 clippy 警告：`cargo clippy`
 
+## 发布到 crates.io
+
+本项目配置了自动化发布流水线，可以通过创建版本标签自动发布到 crates.io。
+
+### 配置 CRATES_IO_TOKEN
+
+在发布之前，需要在 GitHub 仓库中配置 crates.io API token：
+
+1. 访问 [crates.io](https://crates.io/) 并登录您的账号
+2. 进入 [Account Settings](https://crates.io/settings/tokens) 页面
+3. 点击 "New Token" 创建一个新的 API token
+4. 复制生成的 token
+5. 在 GitHub 仓库页面，进入 `Settings` > `Secrets and variables` > `Actions`
+6. 点击 `New repository secret`
+7. 添加以下 secret：
+   - **Name**: `CRATES_IO_TOKEN`
+   - **Value**: 粘贴您在步骤 4 中复制的 token
+
+### 发布新版本
+
+当需要发布新版本时，按照以下步骤操作：
+
+1. **更新版本号**：编辑 `Cargo.toml` 文件中的 `version` 字段
+   ```toml
+   version = "0.1.1"  # 更新为新版本号
+   ```
+
+2. **提交更改**：
+   ```bash
+   git add Cargo.toml
+   git commit -m "Bump version to 0.1.1"
+   git push origin main
+   ```
+
+3. **创建并推送标签**：
+   ```bash
+   # 创建标签（格式为 v{版本号}）
+   git tag v0.1.1
+   
+   # 推送标签到 GitHub
+   git push origin v0.1.1
+   ```
+
+4. **自动发布**：推送标签后，GitHub Actions 会自动触发发布流程：
+   - 检出代码
+   - 设置 Rust 工具链
+   - 运行所有测试
+   - 发布到 crates.io
+
+您可以在仓库的 `Actions` 标签页查看发布流程的执行状态。
+
+### 手动发布（备选方案）
+
+如果需要手动发布，可以在本地执行：
+
+```bash
+# 确保所有测试通过
+cargo test --all-features
+
+# 登录 crates.io（首次发布时需要）
+cargo login
+
+# 发布到 crates.io
+cargo publish
+```
+
 ## 许可证
 
-本项目当前在仓库中未附带单独的 LICENSE 文件；在将本项目用于生产环境或进行再分发之前，请先与维护者确认具体的许可条款。
+本项目采用 MIT 许可证 - 详见 [LICENSE](LICENSE) 文件。
 
 ## 相关链接
 
