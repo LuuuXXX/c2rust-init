@@ -96,7 +96,7 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
                 }
             };
 
-            // Success - print messages now that all operations succeeded
+            // Core steps succeeded; optional steps (git config, .gitignore) may have emitted warnings above
             println!("已创建目录: .c2rust");
             println!("已在 .c2rust 目录初始化 Git 仓库");
             if git_config_success {
