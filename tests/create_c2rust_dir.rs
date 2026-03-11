@@ -161,6 +161,8 @@ fn test_gitignore_is_created() {
     // Verify .gitignore content
     let content = fs::read_to_string(&gitignore_path).expect("Failed to read .gitignore");
     assert!(content.contains("*\n"), ".gitignore should ignore everything by default");
+    assert!(content.contains("!*/"), ".gitignore should re-include directories so negations work in subdirectories");
+    assert!(content.contains("!.gitignore"), ".gitignore file itself should not be ignored");
     assert!(content.contains("!*.c"), ".gitignore should not ignore *.c files");
     assert!(content.contains("!*.h"), ".gitignore should not ignore *.h files");
     assert!(content.contains("!*.c2rust*"), ".gitignore should not ignore *.c2rust* files");

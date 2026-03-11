@@ -87,7 +87,7 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
 
             // Create .gitignore in .c2rust directory
             let gitignore_path = c2rust_dir.join(".gitignore");
-            let gitignore_content = "*\n!*.c\n!*.h\n!*.c2rust*\n!*.rs\n!*.json\n";
+            let gitignore_content = "*\n!*/\n!.gitignore\n!*.c\n!*.h\n!*.c2rust*\n!*.rs\n!*.json\n";
             let gitignore_success = match fs::write(&gitignore_path, gitignore_content) {
                 Ok(_) => true,
                 Err(e) => {
