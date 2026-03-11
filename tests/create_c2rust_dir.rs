@@ -129,7 +129,45 @@ fn test_create_c2rust_dir_failure() {
     assert!(c2rust_path.exists(), "Path .c2rust should still exist");
 }
 
-/// Test that git config (user.name and user.email) is set in the repository
+/// Test that .gitignore is created with correct content
+#[test]
+fn test_gitignore_is_created() {
+    let temp_dir = TempDir::new().unwrap();
+    let temp_path = temp_dir.path();
+
+    let output = Command::new(env!("CARGO_BIN_EXE_c2rust-init"))
+        .arg("init")
+        .current_dir(temp_path)
+        .output()
+        .expect("Failed to execute binary");
+
+    assert!(output.status.success(), "Command should succeed");
+
+    // Check stdout contains .gitignore creation message
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(
+        stdout.contains("已创建 .gitignore 文件"),
+        "Expected .gitignore creation message in stdout, got: {}",
+        stdout
+    );
+
+    // Verify .gitignore was created
+    let gitignore_path = temp_path.join(".c2rust").join(".gitignore");
+    assert!(
+        gitignore_path.exists() && gitignore_path.is_file(),
+        ".gitignore should exist in .c2rust directory"
+    );
+
+    // Verify .gitignore content
+    let content = fs::read_to_string(&gitignore_path).expect("Failed to read .gitignore");
+    assert!(content.contains("*\n"), ".gitignore should ignore everything by default");
+    assert!(content.contains("!*.c"), ".gitignore should not ignore *.c files");
+    assert!(content.contains("!*.h"), ".gitignore should not ignore *.h files");
+    assert!(content.contains("!*.c2rust*"), ".gitignore should not ignore *.c2rust* files");
+    assert!(content.contains("!*.rs"), ".gitignore should not ignore *.rs files");
+    assert!(content.contains("!*.json"), ".gitignore should not ignore *.json files");
+}
+
 #[test]
 fn test_git_config_is_set() {
     let temp_dir = TempDir::new().unwrap();

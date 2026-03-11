@@ -85,11 +85,25 @@ fn init_c2rust_dir() -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
 
+            // Create .gitignore in .c2rust directory
+            let gitignore_path = c2rust_dir.join(".gitignore");
+            let gitignore_content = "*\n!*.c\n!*.h\n!*.c2rust*\n!*.rs\n!*.json\n";
+            let gitignore_success = match fs::write(&gitignore_path, gitignore_content) {
+                Ok(_) => true,
+                Err(e) => {
+                    eprintln!("警告: 无法创建 .gitignore 文件: {}", e);
+                    false
+                }
+            };
+
             // Success - print messages now that all operations succeeded
             println!("已创建目录: .c2rust");
             println!("已在 .c2rust 目录初始化 Git 仓库");
             if git_config_success {
                 println!("已配置默认的 git user.name 和 user.email");
+            }
+            if gitignore_success {
+                println!("已创建 .gitignore 文件");
             }
         }
         Err(e) => {
