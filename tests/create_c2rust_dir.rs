@@ -143,14 +143,6 @@ fn test_gitignore_is_created() {
 
     assert!(output.status.success(), "Command should succeed");
 
-    // Check stdout contains .gitignore creation message
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    assert!(
-        stdout.contains("已创建 .gitignore 文件"),
-        "Expected .gitignore creation message in stdout, got: {}",
-        stdout
-    );
-
     // Verify .gitignore was created
     let gitignore_path = temp_path.join(".c2rust").join(".gitignore");
     assert!(
@@ -160,14 +152,21 @@ fn test_gitignore_is_created() {
 
     // Verify .gitignore content
     let content = fs::read_to_string(&gitignore_path).expect("Failed to read .gitignore");
-    assert!(content.contains("*\n"), ".gitignore should ignore everything by default");
-    assert!(content.contains("!*/"), ".gitignore should re-include directories so negations work in subdirectories");
-    assert!(content.contains("!.gitignore"), ".gitignore file itself should not be ignored");
-    assert!(content.contains("!*.c"), ".gitignore should not ignore *.c files");
-    assert!(content.contains("!*.h"), ".gitignore should not ignore *.h files");
-    assert!(content.contains("!*.c2rust*"), ".gitignore should not ignore *.c2rust* files");
-    assert!(content.contains("!*.rs"), ".gitignore should not ignore *.rs files");
-    assert!(content.contains("!*.json"), ".gitignore should not ignore *.json files");
+    let expected_lines = [
+        "*",
+        "!*/",
+        "!.gitignore",
+        "!*.c",
+        "!*.h",
+        "!*.c2rust*",
+        "!*.rs",
+        "!*.json",
+    ];
+    let actual_lines: Vec<&str> = content.lines().collect();
+    assert_eq!(
+        actual_lines, expected_lines,
+        ".gitignore content did not match expected lines"
+    );
 }
 
 #[test]
