@@ -129,7 +129,46 @@ fn test_create_c2rust_dir_failure() {
     assert!(c2rust_path.exists(), "Path .c2rust should still exist");
 }
 
-/// Test that git config (user.name and user.email) is set in the repository
+/// Test that .gitignore is created with correct content
+#[test]
+fn test_gitignore_is_created() {
+    let temp_dir = TempDir::new().unwrap();
+    let temp_path = temp_dir.path();
+
+    let output = Command::new(env!("CARGO_BIN_EXE_c2rust-init"))
+        .arg("init")
+        .current_dir(temp_path)
+        .output()
+        .expect("Failed to execute binary");
+
+    assert!(output.status.success(), "Command should succeed");
+
+    // Verify .gitignore was created
+    let gitignore_path = temp_path.join(".c2rust").join(".gitignore");
+    assert!(
+        gitignore_path.exists() && gitignore_path.is_file(),
+        ".gitignore should exist in .c2rust directory"
+    );
+
+    // Verify .gitignore content
+    let content = fs::read_to_string(&gitignore_path).expect("Failed to read .gitignore");
+    let expected_lines = [
+        "*",
+        "!*/",
+        "!.gitignore",
+        "!*.c",
+        "!*.h",
+        "!*.c2rust*",
+        "!*.rs",
+        "!*.json",
+    ];
+    let actual_lines: Vec<&str> = content.lines().collect();
+    assert_eq!(
+        actual_lines, expected_lines,
+        ".gitignore content did not match expected lines"
+    );
+}
+
 #[test]
 fn test_git_config_is_set() {
     let temp_dir = TempDir::new().unwrap();
